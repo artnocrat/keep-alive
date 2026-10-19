@@ -8,9 +8,7 @@
 <style>
 :root{--bg:#080c18;--panel:#0f1730;--panel2:#17234d;--edge:rgba(255,255,255,.09);--ink:#eef1fa;--muted:#9aa4c0;--line:#34406b;--dot:rgba(255,255,255,.075);--lamp:#ffb020;--wire:#ffb020;--lamp-ink:#1a1100;--glow:rgba(255,176,32,.2);--glass:rgba(8,12,24,.74);--ok:#3be8b0;--warn:#ffb020;--bad:#ff5448;--focus:#5cc8ff;
 color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#e9edf5;--panel:#fff;--panel2:#f3f5fa;--edge:rgba(11,18,38,.11);--ink:#0b1226;--muted:#535d77;--line:#aab3c9;--dot:rgba(11,18,38,.09);--wire:#d96a00;--glow:rgba(255,176,32,.3);--glass:rgba(233,237,245,.78);--ok:#0b8f62;--warn:#b45f00;--bad:#d3261b;--focus:#0a68c4;color-scheme:light}}
-:root[data-theme="light"]{--bg:#e9edf5;--panel:#fff;--panel2:#f3f5fa;--edge:rgba(11,18,38,.11);--ink:#0b1226;--muted:#535d77;--line:#aab3c9;--dot:rgba(11,18,38,.09);--wire:#d96a00;--glow:rgba(255,176,32,.3);--glass:rgba(233,237,245,.78);--ok:#0b8f62;--warn:#b45f00;--bad:#d3261b;--focus:#0a68c4;color-scheme:light}
-html{scroll-padding-top:calc(64px + env(safe-area-inset-top,0px));scroll-snap-type:y proximity}
+html{scroll-padding-top:calc(64px + env(safe-area-inset-top,0px))}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 "Schibsted Grotesk","Avenir Next","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);z-index:10}
@@ -104,19 +102,55 @@ dialog small{display:block;color:var(--muted);font-size:13px;margin:18px 0 4px}
 .right{display:flex;flex-direction:column;gap:14px}
 .pr{grid-template-columns:repeat(3,1fr);gap:40px}
 dialog{margin:auto;border-radius:28px}.grab{display:none}.in2{padding-bottom:28px}}
-@media (prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;animation:none}.ecg path{animation:none;stroke-dashoffset:0}.hero::before,.lamp,.ln.on,.cap.in,.tile.bad,.tile[data-c=phone].bad,dialog[open],dialog[open]::backdrop{animation:none}.tile{transition:none}}
+
+.navcta,.tl{display:none}
+.hero-art{position:relative}
+@media (max-width:859px){html{scroll-snap-type:y proximity}}
+@keyframes ping{0%{transform:translate(-50%,-50%) scale(.3);opacity:.7}100%{transform:translate(-50%,-50%) scale(1.25);opacity:0}}
+@media (min-width:860px){
+.nav .wrap{justify-content:space-between}
+.navcta{display:inline-flex;align-items:center;min-height:36px;padding:0 16px;border-radius:10px;background:var(--lamp);color:var(--lamp-ink);font-weight:700;font-size:15px;text-decoration:none}
+.wrap{max-width:1180px;padding:0 40px}
+.hero{display:grid;align-items:center;min-height:calc(100dvh - 52px);padding:0}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:72px;align-items:center;width:100%;padding-top:56px;padding-bottom:56px}
+.hero-copy{order:1}.hero-art{order:2}
+h1{font-size:clamp(3.4rem,6.2vw,6rem);max-width:12ch}
+.hero p{font-size:1.5rem;max-width:26ch}
+.hero-art{display:grid;place-items:center;width:100%;max-width:520px;margin-left:auto;aspect-ratio:1;overflow:hidden;border:1px solid var(--edge);border-radius:36px;background:radial-gradient(closest-side,var(--glow),transparent 75%),linear-gradient(180deg,var(--panel2),var(--panel));box-shadow:0 50px 120px -60px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06)}
+.hero-art::before,.hero-art::after{content:"";position:absolute;left:50%;top:50%;width:70%;aspect-ratio:1;border:1.5px solid var(--wire);border-radius:50%;opacity:0;animation:ping 2.6s ease-out infinite}
+.hero-art::after{animation-delay:1.3s}
+.ecg{position:relative;z-index:1;width:92%;margin:0}
+.demo,.promises{padding:120px 0}
+h2{font-size:clamp(2.4rem,4.4vw,3.6rem)}
+.lede{font-size:1.35rem}
+.pills button{min-height:48px;padding:0 22px}
+.stage{grid-template-columns:minmax(0,520px) 1fr;gap:64px;padding:44px 48px}
+.scene{max-width:520px;width:clamp(340px,calc((100dvh - 220px) * .762),520px)}
+.right{gap:20px}
+#ct{font-size:clamp(1.9rem,2.6vw,2.5rem)}
+#cd{font-size:1.2rem}
+.tl{display:grid;counter-reset:s;gap:2px;list-style:none;margin:12px 0 0;padding:12px 0 0;border-top:1px solid var(--edge)}
+.tl button{display:flex;align-items:center;gap:12px;width:100%;min-height:40px;padding:0 10px;border:0;border-radius:10px;background:none;color:var(--muted);text-align:left;cursor:pointer;counter-increment:s}
+.tl button::before{content:counter(s);display:grid;place-items:center;flex:none;width:24px;height:24px;border:1px solid var(--line);border-radius:50%;font-size:12px}
+.tl button:hover{background:var(--panel2);color:var(--ink)}
+.tl .done::before{border-color:var(--wire);color:var(--wire)}
+.tl [aria-current]{background:var(--panel2);color:var(--ink)}
+.tl [aria-current]::before{background:var(--lamp);border-color:var(--lamp);color:var(--lamp-ink)}
+.pr{gap:56px}.pr h3{font-size:1.9rem}.pr p{font-size:1.15rem}
+}
+@media (prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;animation:none}.ecg path{animation:none;stroke-dashoffset:0}.hero::before,.hero-art::before,.hero-art::after,.lamp,.ln.on,.cap.in,.tile.bad,.tile[data-c=phone].bad,dialog[open],dialog[open]::backdrop{animation:none}.tile{transition:none}}
 </style>
 </head>
 <body>
 <div class="atmo" aria-hidden="true"></div>
-<header class="nav"><div class="wrap"><span class="brand"><i class="lamp"></i>Keep Alive</span></div></header>
+<header class="nav"><div class="wrap"><span class="brand"><i class="lamp"></i>Keep Alive</span><a class="navcta" href="#play">See it work</a></div></header>
 <main>
-<section class="hero"><div class="wrap">
-<svg class="ecg" viewBox="0 0 600 100" aria-hidden="true"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" style="stop-color:var(--lamp)"/><stop offset="1" style="stop-color:var(--focus)"/></linearGradient></defs><path pathLength="1" d="M0 56H150L170 56L186 18L206 92L224 40L240 56H380L400 56L416 24L434 86L450 46L464 56H600" fill="none" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<section class="hero"><div class="wrap hero-grid"><div class="hero-art">
+<svg class="ecg" viewBox="0 0 600 100" aria-hidden="true"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" style="stop-color:var(--lamp)"/><stop offset="1" style="stop-color:var(--focus)"/></linearGradient></defs><path pathLength="1" d="M0 56H150L170 56L186 18L206 92L224 40L240 56H380L400 56L416 24L434 86L450 46L464 56H600" fill="none" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="hero-copy">
 <h1 class="rise" style="--i:1">Know the moment something breaks.</h1>
 <p class="rise" style="--i:2">Keep Alive watches every service the bank depends on, and tells the right people straight away.</p>
 <a class="cta rise" style="--i:3" href="#play">See it work</a>
-</div></section>
+</div></div></section>
 <section class="demo" id="demo"><div class="wrap">
 <h2>Break something. See what happens.</h2>
 <p class="lede">Pick a situation and watch Keep Alive respond, one step at a time.</p>
@@ -127,7 +161,7 @@ dialog{margin:auto;border-radius:28px}.grab{display:none}.in2{padding-bottom:28p
 <div id="tiles"></div></div>
 <p class="hint">Tap any tile to see what it is.</p></div>
 <div class="right"><div class="cap" id="cap" aria-live="polite"><h3 id="ct"></h3><p id="cd"></p></div>
-<div class="ctl"><button class="pp" id="pp" type="button">Pause</button><div class="prog" id="prog"></div><button class="nx" id="nx" type="button">Next</button></div></div>
+<div class="ctl"><button class="pp" id="pp" type="button">Pause</button><div class="prog" id="prog"></div><button class="nx" id="nx" type="button">Next</button></div><ol class="tl" id="tl"></ol></div>
 </div></div></div></section>
 <section class="promises"><div class="wrap"><h2>Three promises.</h2>
 <div class="pr"><div><h3>Looks. Never touches.</h3><p>It only checks whether a service answers. It changes nothing.</p></div>
@@ -182,12 +216,14 @@ function show(i){step=i;const st=cur.s[i],s=state(i);
  for(const k in lines)lines[k].classList.toggle('on',(st.on||[]).includes(k));
  $('#ct').textContent=st.t;$('#cd').textContent=st.d;const c=$('#cap');c.classList.remove('in');void c.offsetWidth;c.classList.add('in');
  [...$('#prog').children].forEach((b,j)=>{b.className=j<i?'done':'';j==i?b.setAttribute('aria-current','step'):b.removeAttribute('aria-current')});
+ [...$('#tl').children].forEach((li,j)=>{const b=li.firstChild;b.className=j<i?'done':'';j==i?b.setAttribute('aria-current','step'):b.removeAttribute('aria-current')});
  $('#nx').disabled=i==cur.s.length-1;upd()}
 function upd(){if(!cur)return;$('#pp').textContent=timer?'Pause':step==cur.s.length-1?'Replay':'Play'}
 function stop(){clearInterval(timer);timer=null;upd()}
 function play(a){if(rm&&a)return;stop();timer=setInterval(()=>{if(step<cur.s.length-1)show(step+1);else stop()},4500);upd()}
 function pick(i){stop();cur=SC[i];[...$('#pills').children].forEach((b,j)=>b.setAttribute('aria-pressed',String(j==i)));
  const p=$('#prog');p.textContent='';cur.s.forEach((_,j)=>{const b=h('button',{type:'button','aria-label':'Step '+(j+1)});b.onclick=()=>{touched=true;stop();show(j)};p.append(b)});
+ const tl=$('#tl');tl.textContent='';cur.s.forEach((x,j)=>{const b=h('button',{type:'button'},x.t);b.onclick=()=>{touched=true;stop();show(j)};tl.append(h('li',{},b))});
  show(0);if(touched||inView)play(1)}
 SC.forEach((s,i)=>$('#pills').append(Object.assign(h('button',{type:'button','aria-pressed':'false'},s.n),{onclick(){touched=true;pick(i)}})));
 $('#pp').onclick=()=>{touched=true;if(timer)stop();else{if(step==cur.s.length-1)show(0);play()}};
