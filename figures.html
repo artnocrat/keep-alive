@@ -1,227 +1,831 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AGMB Keep-Alive — SDD Figures Gallery</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AGMB Keep-Alive — SDD Figures Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@700;800&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #080c18;
+  --panel: #0f1730;
+  --panel2: #17234d;
+  --edge: rgba(255, 255, 255, .09);
+  --edge-bright: rgba(255, 255, 255, .16);
+  --ink: #eef1fa;
+  --muted: #9aa4c0;
+  --line: #34406b;
+  --dot: rgba(255, 255, 255, .075);
+  --lamp: #ffb020;
+  --wire: #ffb020;
+  --lamp-ink: #1a1100;
+  --glow: rgba(255, 176, 32, .18);
+  --glass: rgba(8, 12, 24, .82);
+  --ok: #3be8b0;
+  --warn: #ffb020;
+  --bad: #ff5448;
+  --focus: #5cc8ff;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.55 "Schibsted Grotesk", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.atmo {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(65% 40% at 50% -8%, var(--glow), transparent 70%),
+    radial-gradient(circle at 1px 1px, var(--dot) 1px, transparent 1.6px) 0 0 / 26px 26px;
+  -webkit-mask-image: linear-gradient(#000 55%, transparent 100%);
+  mask-image: linear-gradient(#000 55%, transparent 100%);
+}
+h1, h2, h3 {
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+.wrap {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+main.wrap { flex: 1; }
+button, a { font: inherit; color: inherit; }
+:is(button, a):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* Header & Nav */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--edge);
+  padding: 0 24px;
+}
+.nav-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 10px 0;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 800;
+  font-size: 1.05rem;
+  text-decoration: none;
+}
+.brand-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 176, 32, 0.12);
+  color: var(--lamp);
+  border: 1px solid rgba(255, 176, 32, 0.25);
+}
+.lamp {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--lamp);
+  box-shadow: 0 0 12px var(--lamp);
+  animation: blink 2.6s infinite;
+}
+@keyframes blink {
+  0%, 40%, 100% { transform: scale(1); opacity: .75; }
+  10%, 30% { transform: scale(1.35); opacity: 1; }
+  20% { transform: scale(1); opacity: .8; }
+}
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--edge-bright);
+  text-decoration: none;
+  transition: all .2s;
+}
+.btn-ghost:hover {
+  color: var(--ink);
+  border-color: var(--lamp);
+}
+.btn-lamp {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 10px;
+  background: var(--lamp);
+  color: var(--lamp-ink);
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  box-shadow: 0 4px 18px -4px rgba(255, 176, 32, 0.5);
+  transition: transform .15s;
+}
+.btn-lamp:hover { transform: translateY(-1px); }
+
+/* Page Intro & Filter Pills */
+.page-head { padding: 44px 0 24px; }
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11.5px;
+  color: var(--focus);
+  background: rgba(92, 200, 255, 0.08);
+  border: 1px solid rgba(92, 200, 255, 0.22);
+  padding: 4px 11px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+h1 {
+  font-size: clamp(1.85rem, 4.2vw, 2.75rem);
+  line-height: 1.1;
+}
+.sub {
+  color: var(--muted);
+  margin: 10px 0 24px;
+  max-width: 62ch;
+}
+.pills {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: none;
+}
+.filter-btn {
+  flex: none;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--edge-bright);
+  border-radius: 11px;
+  background: var(--panel);
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.filter-btn:hover {
+  color: var(--ink);
+  border-color: var(--line);
+}
+.filter-btn.active {
+  background: var(--lamp);
+  color: var(--lamp-ink);
+  border-color: var(--lamp);
+  box-shadow: 0 0 24px -6px var(--lamp);
+}
+
+/* Gallery Grid */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  padding: 12px 0 72px;
+}
+@media (min-width: 780px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+.card {
+  background: linear-gradient(180deg, var(--panel2), var(--panel));
+  border: 1px solid var(--edge-bright);
+  border-radius: 22px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  box-shadow: 0 28px 60px -38px rgba(0, 0, 0, .8), inset 0 1px 0 rgba(255, 255, 255, .07);
+  transition: transform .22s, border-color .22s, box-shadow .22s;
+}
+.card:hover {
+  transform: translateY(-3px);
+  border-color: var(--lamp);
+  box-shadow: 0 32px 70px -34px rgba(0, 0, 0, .9), 0 0 28px -10px var(--glow);
+}
+.thumb {
+  height: 255px;
+  background: rgba(8, 12, 24, 0.72);
+  border-bottom: 1px solid var(--edge);
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.thumb::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 1px 1px, var(--dot) 1px, transparent 1.5px) 0 0 / 16px 16px;
+  pointer-events: none;
+}
+.thumb img {
+  position: relative;
+  z-index: 1;
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  transition: transform .35s cubic-bezier(.2, .8, .2, 1);
+}
+.card:hover .thumb img { transform: scale(1.04); }
+.zoom-pill {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  background: var(--glass);
+  border: 1px solid var(--edge-bright);
+  color: var(--lamp);
+  padding: 4px 10px;
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all .2s;
+}
+.card:hover .zoom-pill { opacity: 1; transform: none; }
+.card-body {
+  padding: 22px 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.fig-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--lamp);
+  background: rgba(255, 176, 32, 0.12);
+  border: 1px solid rgba(255, 176, 32, 0.28);
+  padding: 3px 9px;
+  border-radius: 6px;
+}
+.sec-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.card h2 {
+  font-size: 1.3rem;
+  margin-bottom: 6px;
+}
+.card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+.card-foot {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--edge);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--focus);
+}
+.copy-chip {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--edge);
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.copy-chip:hover {
+  color: var(--ink);
+  border-color: var(--focus);
+}
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--edge);
+  padding: 28px 0 40px;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+.foot-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.foot-links { display: flex; gap: 20px; }
+.foot-links a { color: var(--muted); text-decoration: none; }
+.foot-links a:hover { color: var(--lamp); }
+
+/* Interactive Pan/Zoom Lightbox */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(6, 9, 19, 0.96);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  display: none;
+  flex-direction: column;
+}
+.modal.open { display: flex; }
+.modal-bar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--edge-bright);
+}
+.modal-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.modal-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.zoom-readout {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: var(--lamp);
+  min-width: 52px;
+  text-align: center;
+}
+.ctrl-btn {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--panel2);
+  border: 1px solid var(--edge-bright);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: border-color .15s;
+}
+.ctrl-btn:hover { border-color: var(--lamp); }
+.ctrl-close {
+  background: rgba(255, 84, 72, 0.15);
+  border-color: rgba(255, 84, 72, 0.35);
+  color: var(--bad);
+}
+.ctrl-close:hover { border-color: var(--bad); }
+
+/* Fixed Unclipped Viewport Stage */
+.canvas {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 1px 1px, var(--dot) 1px, transparent 1.5px) 0 0 / 24px 24px;
+}
+.canvas.dragging {
+  cursor: grabbing;
+}
+.stage-layer {
+  transform-origin: center center;
+  will-change: transform;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.stage-layer img {
+  display: block;
+  max-width: 88vw;
+  max-height: 78vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  user-select: none;
+  border-radius: 8px;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.75);
+}
+.canvas-hint {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11.5px;
+  color: var(--muted);
+  background: rgba(15, 23, 48, 0.9);
+  border: 1px solid var(--edge-bright);
+  padding: 6px 14px;
+  border-radius: 999px;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 2;
+}
+</style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans selection:bg-blue-500 selection:text-white">
+<body>
+<div class="atmo" aria-hidden="true"></div>
 
-  <!-- Sticky Top Bar -->
-  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div>
-        <div class="flex items-center gap-2.5">
-          <span class="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <h1 class="text-xl font-bold tracking-tight">AGMB Keep-Alive — SDD Figures</h1>
-        </div>
-        <p class="text-xs text-slate-400 mt-0.5">High-resolution diagrams from the Software Design Document • Click any figure to pan & zoom</p>
-      </div>
-      <div class="flex items-center gap-3">
-        <a href="https://docs.google.com/document/d/1YlEdDHDNlh-fyaAr7SU5GsGc8Jer7q9eGm_IvGP1CLE/edit?usp=sharing" target="_blank" rel="noopener"
-           class="text-xs sm:text-sm bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3.5 py-2 rounded-lg transition">
-          📄 Read SDD Doc
-        </a>
-        <a href="/keep-alive/"
-           class="text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2 rounded-lg border border-slate-700 transition">
-          ← Interactive App
-        </a>
-      </div>
-    </div>
-
-    <!-- Filter Tabs -->
-    <div class="max-w-7xl mx-auto px-6 pb-3 flex gap-2 overflow-x-auto" id="filter-tabs">
-      <button data-filter="all" class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full bg-blue-600 text-white transition">All Figures (5)</button>
-      <button data-filter="3" class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Sec 3: Architecture (2)</button>
-      <button data-filter="4" class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Sec 4: Data Design (2)</button>
-      <button data-filter="5" class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Sec 5: Component Design (1)</button>
-    </div>
-  </header>
-
-  <!-- Gallery Grid -->
-  <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6" id="gallery"></main>
-
-  <!-- Interactive Pan/Zoom Lightbox Modal -->
-  <div id="modal" class="fixed inset-0 bg-slate-950/95 z-50 hidden flex-col">
-    <!-- Modal Header -->
-    <div class="flex flex-wrap justify-between items-center px-6 py-3.5 bg-slate-900 border-b border-slate-800 gap-3">
-      <div class="flex items-center gap-3">
-        <span id="modal-badge" class="text-xs font-mono uppercase bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2.5 py-0.5 rounded"></span>
-        <div>
-          <h3 id="modal-title" class="font-semibold text-sm sm:text-base"></h3>
-          <p id="modal-section" class="text-xs text-slate-400"></p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <button id="prev-btn" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded border border-slate-700 transition" title="Previous Figure (Left Arrow)">← Prev</button>
-        <button id="next-btn" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded border border-slate-700 transition" title="Next Figure (Right Arrow)">Next →</button>
-        <span class="text-slate-700 mx-1">|</span>
-        <button id="zoom-in" class="text-xs bg-slate-800 hover:bg-slate-700 px-2.5 py-1.5 rounded border border-slate-700 transition">+</button>
-        <button id="zoom-out" class="text-xs bg-slate-800 hover:bg-slate-700 px-2.5 py-1.5 rounded border border-slate-700 transition">−</button>
-        <button id="reset-zoom" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded border border-slate-700 transition">Reset</button>
-        <a id="open-raw" href="#" target="_blank" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded border border-slate-700 transition">Raw ↗</a>
-        <button id="close-modal" class="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-300 px-3 py-1.5 rounded border border-red-500/30 transition">Close (Esc)</button>
-      </div>
-    </div>
-
-    <!-- Panzoom Canvas -->
-    <div class="flex-1 overflow-hidden flex items-center justify-center cursor-grab active:cursor-grabbing relative" id="panzoom-container">
-      <img id="modal-img" src="" alt="Diagram" class="max-h-[82vh] max-w-[92vw] object-contain select-none shadow-2xl" />
-      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-900/80 border border-slate-800 text-slate-400 text-[11px] px-3 py-1 rounded-full pointer-events-none">
-        Scroll to zoom • Drag to pan • Use ← / → arrow keys to switch figures
-      </div>
+<header class="nav">
+  <div class="wrap nav-top">
+    <a href="./" class="brand">
+      <i class="lamp"></i>
+      <span>Keep-Alive</span>
+      <span class="brand-badge">SDD Figures</span>
+    </a>
+    <div class="nav-actions">
+      <a class="btn-ghost" href="./">← Interactive Simulator</a>
+      <a class="btn-lamp" href="https://docs.google.com/document/d/1YlEdDHDNlh-fyaAr7SU5GsGc8Jer7q9eGm_IvGP1CLE/edit?usp=sharing" target="_blank" rel="noopener">📄 Read SDD Doc</a>
     </div>
   </div>
+</header>
 
-  <script>
-    const figures = [
-      {
-        slug: "fig-3-1",
-        id: "Figure 3.1",
-        group: "3",
-        section: "Section 3.1.1 — Architecture",
-        title: "Architecture",
-        desc: "System-wide architectural topology showing how Probe Worker (KA-1), Ingestion API (KA-2), Alert Engine (KA-4), and Notifier (KA-5) interact.",
-        src: "assets/fig-3-1-architecture.png"
-      },
-      {
-        slug: "fig-3-2",
-        id: "Figure 3.2",
-        group: "3",
-        section: "Section 3.1.3 — Deployment and Operations View",
-        title: "Deployment",
-        desc: "Infrastructure layout, container boundaries, network zones, and runtime deployment topology for AGMB Keep-Alive.",
-        src: "assets/fig-3-2-deployment.png"
-      },
-      {
-        slug: "fig-4-1",
-        id: "Figure 4.1",
-        group: "4",
-        section: "Section 4.1.2 — Alert State Model",
-        title: "Alert state model",
-        desc: "Finite state machine governing state transitions across healthy, pending, firing, acknowledged, and resolved service states.",
-        src: "assets/fig-4-1-alert-state.png"
-      },
-      {
-        slug: "fig-4-2",
-        id: "Figure 4.2",
-        group: "4",
-        section: "Section 4.1.1 / 4.2 — Principal Data & Data Dictionary",
-        title: "Data model",
-        desc: "Entity-relationship schema detailing tables, primary/foreign keys, probe telemetry records, and alert history storage.",
-        src: "assets/fig-4-2-data-model.png"
-      },
-      {
-        slug: "fig-5-1",
-        id: "Figure 5.1",
-        group: "5",
-        section: "Section 5.3 — Worked Scenario: A Service Stops Answering",
-        title: "Sequence of a service outage",
-        desc: "End-to-end chronological sequence diagram tracing a failed health check from KA-1 probe timeout to KA-5 alert dispatch.",
-        src: "assets/fig-5-1-outage-sequence.png"
-      }
-    ];
+<main class="wrap">
+  <section class="page-head">
+    <div class="eyebrow">HIGH-RESOLUTION SDD DIAGRAMS</div>
+    <h1>System Architecture & Data Figures</h1>
+    <p class="sub">Inspect, pan, and zoom into the full-resolution schematics referenced in the AGMB Keep-Alive Software Design Document.</p>
+    <div class="pills" id="filter-tabs">
+      <button data-filter="all" class="filter-btn active">All Figures (5)</button>
+      <button data-filter="3" class="filter-btn">Section 3: System Architecture (2)</button>
+      <button data-filter="4" class="filter-btn">Section 4: Data Design (2)</button>
+      <button data-filter="5" class="filter-btn">Section 5: Component Design (1)</button>
+    </div>
+  </section>
 
-    let currentIndex = 0;
-    const gallery = document.getElementById('gallery');
-    const modal = document.getElementById('modal');
-    const modalImg = document.getElementById('modal-img');
-    const modalTitle = document.getElementById('modal-title');
-    const modalSection = document.getElementById('modal-section');
-    const modalBadge = document.getElementById('modal-badge');
-    const openRaw = document.getElementById('open-raw');
-    const container = document.getElementById('panzoom-container');
+  <section class="grid" id="gallery"></section>
+</main>
 
-    const panzoom = Panzoom(modalImg, { maxScale: 8, minScale: 0.4, contain: 'outside' });
-    container.addEventListener('wheel', panzoom.zoomWithWheel);
+<footer>
+  <div class="wrap foot-inner">
+    <span>AGMB Keep-Alive • SDD Visual Architecture Repository</span>
+    <div class="foot-links">
+      <a href="./">Live Simulator</a>
+      <a href="https://docs.google.com/document/d/1YlEdDHDNlh-fyaAr7SU5GsGc8Jer7q9eGm_IvGP1CLE/edit?usp=sharing" target="_blank" rel="noopener">Google Doc SDD</a>
+    </div>
+  </div>
+</footer>
 
-    function openFigure(index) {
-      currentIndex = (index + figures.length) % figures.length;
-      const fig = figures[currentIndex];
-      modalImg.src = fig.src;
-      modalTitle.textContent = fig.title;
-      modalSection.textContent = fig.section;
-      modalBadge.textContent = fig.id;
-      openRaw.href = fig.src;
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      history.replaceState(null, null, `#${fig.slug}`);
-      setTimeout(() => panzoom.reset(), 40);
-    }
+<!-- Interactive Pan/Zoom Lightbox Modal -->
+<div id="modal" class="modal" role="dialog" aria-modal="true">
+  <div class="modal-bar">
+    <div class="modal-info">
+      <span id="modal-badge" class="fig-badge"></span>
+      <div>
+        <h3 id="modal-title" style="font-size: 1rem;"></h3>
+        <span id="modal-section" class="sec-label"></span>
+      </div>
+    </div>
+    <div class="modal-controls">
+      <button id="prev-btn" class="ctrl-btn" title="Previous (Left Arrow)">← Prev</button>
+      <button id="next-btn" class="ctrl-btn" title="Next (Right Arrow)">Next →</button>
+      <button id="zoom-out" class="ctrl-btn" title="Zoom Out">−</button>
+      <span id="zoom-level" class="zoom-readout">100%</span>
+      <button id="zoom-in" class="ctrl-btn" title="Zoom In">+</button>
+      <button id="reset-zoom" class="ctrl-btn">Reset</button>
+      <button id="copy-link" class="ctrl-btn">Copy Link</button>
+      <a id="open-raw" href="#" target="_blank" class="ctrl-btn">Raw ↗</a>
+      <button id="close-modal" class="ctrl-btn ctrl-close">Close (Esc)</button>
+    </div>
+  </div>
+  <div class="canvas" id="panzoom-container">
+    <div class="stage-layer" id="stage-layer">
+      <img id="modal-img" src="" alt="Diagram" draggable="false" />
+    </div>
+    <div class="canvas-hint">Scroll or double-click to zoom • Drag freely to pan • ← / → keys to switch</div>
+  </div>
+</div>
 
-    function renderGallery(filterGroup = 'all') {
-      gallery.innerHTML = '';
-      figures.forEach((fig, idx) => {
-        if (filterGroup !== 'all' && fig.group !== filterGroup) return;
-        const card = document.createElement('div');
-        card.className = "bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-blue-500/50 transition cursor-pointer group flex flex-col shadow-lg";
-        card.innerHTML = `
-          <div class="h-64 bg-slate-950/70 p-4 flex items-center justify-center overflow-hidden border-b border-slate-800 relative">
-            <img src="${fig.src}" alt="${fig.id}: ${fig.title}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300" />
-            <span class="absolute top-3 right-3 text-[11px] bg-slate-900/90 border border-slate-700 text-slate-300 px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition">
-              🔍 Click to zoom
-            </span>
+<script>
+function makeBlueprintSVG(id, title, section) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="800" height="480">
+    <rect width="800" height="480" fill="#080c18"/>
+    <g stroke="#17234d" stroke-width="1">
+      <line x1="0" y1="80" x2="800" y2="80"/><line x1="0" y1="160" x2="800" y2="160"/>
+      <line x1="0" y1="240" x2="800" y2="240"/><line x1="0" y1="320" x2="800" y2="320"/>
+      <line x1="0" y1="400" x2="800" y2="400"/><line x1="160" y1="0" x2="160" y2="480"/>
+      <line x1="320" y1="0" x2="320" y2="480"/><line x1="480" y1="0" x2="480" y2="480"/>
+      <line x1="640" y1="0" x2="640" y2="480"/>
+    </g>
+    <rect x="60" y="60" width="680" height="360" rx="20" fill="#0f1730" stroke="#34406b" stroke-width="2" stroke-dasharray="6 6"/>
+    <circle cx="400" cy="190" r="36" fill="rgba(255,176,32,0.12)" stroke="#ffb020" stroke-width="2"/>
+    <circle cx="400" cy="190" r="8" fill="#ffb020"/>
+    <text x="400" y="265" text-anchor="middle" fill="#ffb020" font-family="monospace" font-size="16" font-weight="bold">${id.toUpperCase()}</text>
+    <text x="400" y="300" text-anchor="middle" fill="#eef1fa" font-family="sans-serif" font-size="26" font-weight="bold">${title}</text>
+    <text x="400" y="335" text-anchor="middle" fill="#9aa4c0" font-family="monospace" font-size="14">${section}</text>
+    <text x="400" y="385" text-anchor="middle" fill="#5cc8ff" font-family="monospace" font-size="12">Drop image into assets/ folder to replace schematic preview</text>
+  </svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+
+const figures = [
+  {
+    slug: "fig-3-1",
+    id: "Figure 3.1",
+    group: "3",
+    section: "Section 3.1.1 — Architecture",
+    title: "Architecture",
+    desc: "End-to-end architectural topology showing how Probe Worker (KA-1), Ingestion API (KA-2), Alert Engine (KA-4), Notifier (KA-5), and Watchdog (KA-14) interact.",
+    src: "assets/fig-3-1-architecture.png"
+  },
+  {
+    slug: "fig-3-2",
+    id: "Figure 3.2",
+    group: "3",
+    section: "Section 3.1.3 — Deployment and Operations View",
+    title: "Deployment",
+    desc: "Runtime deployment layout across isolated external cloud regions, AGMB perimeter boundaries, and independent watchdog hosting.",
+    src: "assets/fig-3-2-deployment.png"
+  },
+  {
+    slug: "fig-4-1",
+    id: "Figure 4.1",
+    group: "4",
+    section: "Section 4.1.2 — Alert State Model",
+    title: "Alert state model",
+    desc: "Finite state machine governing transitions across healthy, suspect/pending quorum, firing, acknowledged, and resolved incident lifecycles.",
+    src: "assets/fig-4-1-alert-state.png"
+  },
+  {
+    slug: "fig-4-2",
+    id: "Figure 4.2",
+    group: "4",
+    section: "Section 4.1.1 / 4.2 — Principal Data & Data Dictionary",
+    title: "Data model",
+    desc: "Entity-relationship schema detailing target registries, partitioned probe telemetry, alert state records, and durable transactional outbox tables.",
+    src: "assets/fig-4-2-data-model.png"
+  },
+  {
+    slug: "fig-5-1",
+    id: "Figure 5.1",
+    group: "5",
+    section: "Section 5.3 — Worked Scenario: A Service Stops Answering",
+    title: "Sequence of a service outage",
+    desc: "Chronological sequence diagram tracing a failed health check from dual KA-1 probe timeouts to KA-4 quorum verification and KA-5 email dispatch.",
+    src: "assets/fig-5-1-outage-sequence.png"
+  }
+];
+
+let currentIndex = 0;
+const gallery = document.getElementById('gallery');
+const modal = document.getElementById('modal');
+const modalImg = document.getElementById('modal-img');
+const stageLayer = document.getElementById('stage-layer');
+const modalTitle = document.getElementById('modal-title');
+const modalSection = document.getElementById('modal-section');
+const modalBadge = document.getElementById('modal-badge');
+const openRaw = document.getElementById('open-raw');
+const zoomLevel = document.getElementById('zoom-level');
+const copyBtn = document.getElementById('copy-link');
+const container = document.getElementById('panzoom-container');
+
+// Native Unclipped Pan & Zoom Controller
+let scale = 1, panX = 0, panY = 0;
+let isDragging = false, startX = 0, startY = 0;
+const MIN_SCALE = 0.35, MAX_SCALE = 8;
+
+function applyTransform(animate = false) {
+  stageLayer.style.transition = animate ? 'transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none';
+  stageLayer.style.transform = `translate3d(${panX}px, ${panY}px, 0) scale(${scale})`;
+  zoomLevel.textContent = Math.round(scale * 100) + '%';
+}
+
+function resetTransform() {
+  scale = 1;
+  panX = 0;
+  panY = 0;
+  applyTransform(true);
+}
+
+function zoomBy(factor, clientX, clientY, animate = true) {
+  const prevScale = scale;
+  scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale * factor));
+  if (clientX !== undefined && clientY !== undefined) {
+    const rect = container.getBoundingClientRect();
+    const cx = clientX - (rect.left + rect.width / 2);
+    const cy = clientY - (rect.top + rect.height / 2);
+    const ratio = scale / prevScale;
+    panX = cx - (cx - panX) * ratio;
+    panY = cy - (cy - panY) * ratio;
+  }
+  applyTransform(animate);
+}
+
+// Mouse / Touch Pointer Dragging
+container.addEventListener('pointerdown', (e) => {
+  if (e.button !== 0) return;
+  isDragging = true;
+  startX = e.clientX - panX;
+  startY = e.clientY - panY;
+  container.classList.add('dragging');
+  container.setPointerCapture(e.pointerId);
+});
+
+container.addEventListener('pointermove', (e) => {
+  if (!isDragging) return;
+  panX = e.clientX - startX;
+  panY = e.clientY - startY;
+  applyTransform(false);
+});
+
+const stopDrag = (e) => {
+  if (!isDragging) return;
+  isDragging = false;
+  container.classList.remove('dragging');
+  if (e.pointerId !== undefined && container.hasPointerCapture(e.pointerId)) {
+    container.releasePointerCapture(e.pointerId);
+  }
+};
+container.addEventListener('pointerup', stopDrag);
+container.addEventListener('pointercancel', stopDrag);
+
+// Wheel Zoom toward cursor
+container.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const delta = -Math.sign(e.deltaY) * 0.18;
+  zoomBy(1 + delta, e.clientX, e.clientY, false);
+}, { passive: false });
+
+// Double-click to toggle zoom
+container.addEventListener('dblclick', (e) => {
+  if (scale > 1.2) {
+    resetTransform();
+  } else {
+    zoomBy(2.25, e.clientX, e.clientY, true);
+  }
+});
+
+function openFigure(index) {
+  currentIndex = (index + figures.length) % figures.length;
+  const fig = figures[currentIndex];
+  const fallback = makeBlueprintSVG(fig.id, fig.title, fig.section);
+  modalImg.onerror = () => { modalImg.src = fallback; };
+  modalImg.src = fig.src;
+  modalTitle.textContent = fig.title;
+  modalSection.textContent = fig.section;
+  modalBadge.textContent = fig.id;
+  openRaw.href = fig.src;
+  modal.classList.add('open');
+  history.replaceState(null, null, `#${fig.slug}`);
+  resetTransform();
+}
+
+function renderGallery(filterGroup = 'all') {
+  gallery.innerHTML = '';
+  figures.forEach((fig, idx) => {
+    if (filterGroup !== 'all' && fig.group !== filterGroup) return;
+    const fallback = makeBlueprintSVG(fig.id, fig.title, fig.section);
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="thumb">
+        <span class="zoom-pill">🔍 Inspect & Zoom</span>
+        <img src="${fig.src}" alt="${fig.id}: ${fig.title}" loading="lazy" draggable="false" />
+      </div>
+      <div class="card-body">
+        <div>
+          <div class="meta">
+            <span class="fig-badge">${fig.id}</span>
+            <span class="sec-label">${fig.section}</span>
           </div>
-          <div class="p-5 flex-1 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between gap-2 mb-2">
-                <span class="text-xs font-mono font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-0.5 rounded">${fig.id}</span>
-                <span class="text-xs text-slate-400 truncate">${fig.section}</span>
-              </div>
-              <h2 class="text-lg font-bold text-slate-100 mb-1">${fig.title}</h2>
-              <p class="text-sm text-slate-400 leading-relaxed">${fig.desc}</p>
-            </div>
-            <div class="mt-4 pt-3 border-t border-slate-800/80 flex justify-between items-center text-xs text-blue-400">
-              <span class="group-hover:underline">Open interactive view</span>
-              <span>→</span>
-            </div>
-          </div>
-        `;
-        card.onclick = () => openFigure(idx);
-        gallery.appendChild(card);
-      });
-    }
+          <h2>${fig.title}</h2>
+          <p>${fig.desc}</p>
+        </div>
+        <div class="card-foot">
+          <span>Open interactive diagram →</span>
+          <button type="button" class="copy-chip" data-slug="${fig.slug}" title="Copy direct link to this figure">#${fig.slug}</button>
+        </div>
+      </div>
+    `;
+    const imgEl = card.querySelector('img');
+    imgEl.onerror = () => { imgEl.src = fallback; };
 
-    // Filter Buttons
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.onclick = () => {
-        document.querySelectorAll('.filter-btn').forEach(b => {
-          b.className = "filter-btn text-xs font-medium px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
-        });
-        btn.className = "filter-btn text-xs font-medium px-3 py-1.5 rounded-full bg-blue-600 text-white transition";
-        renderGallery(btn.dataset.filter);
-      };
-    });
-
-    // Modal Controls
-    document.getElementById('prev-btn').onclick = () => openFigure(currentIndex - 1);
-    document.getElementById('next-btn').onclick = () => openFigure(currentIndex + 1);
-    document.getElementById('zoom-in').onclick = () => panzoom.zoomIn();
-    document.getElementById('zoom-out').onclick = () => panzoom.zoomOut();
-    document.getElementById('reset-zoom').onclick = () => panzoom.reset();
-
-    const closeModal = () => {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-      history.replaceState(null, null, ' ');
+    const copyChip = card.querySelector('.copy-chip');
+    copyChip.onclick = (e) => {
+      e.stopPropagation();
+      const url = `${window.location.origin}${window.location.pathname}#${fig.slug}`;
+      navigator.clipboard.writeText(url);
+      copyChip.textContent = '✓ Copied';
+      setTimeout(() => { copyChip.textContent = `#${fig.slug}`; }, 1500);
     };
-    document.getElementById('close-modal').onclick = closeModal;
 
-    window.addEventListener('keydown', e => {
-      if (modal.classList.contains('hidden')) return;
-      if (e.key === 'Escape') closeModal();
-      if (e.key === 'ArrowRight') openFigure(currentIndex + 1);
-      if (e.key === 'ArrowLeft') openFigure(currentIndex - 1);
-    });
+    card.onclick = () => openFigure(idx);
+    gallery.appendChild(card);
+  });
+}
 
-    // Initial Render + URL Hash Deep-link Support
-    renderGallery();
-    const hash = window.location.hash.replace('#', '');
-    const matchIdx = figures.findIndex(f => f.slug === hash);
-    if (matchIdx !== -1) openFigure(matchIdx);
-  </script>
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGallery(btn.dataset.filter);
+  };
+});
+
+document.getElementById('prev-btn').onclick = () => openFigure(currentIndex - 1);
+document.getElementById('next-btn').onclick = () => openFigure(currentIndex + 1);
+document.getElementById('zoom-in').onclick = () => zoomBy(1.3, undefined, undefined, true);
+document.getElementById('zoom-out').onclick = () => zoomBy(1 / 1.3, undefined, undefined, true);
+document.getElementById('reset-zoom').onclick = resetTransform;
+
+copyBtn.onclick = () => {
+  const fig = figures[currentIndex];
+  const url = `${window.location.origin}${window.location.pathname}#${fig.slug}`;
+  navigator.clipboard.writeText(url);
+  copyBtn.textContent = '✓ Copied!';
+  setTimeout(() => { copyBtn.textContent = 'Copy Link'; }, 1500);
+};
+
+const closeModal = () => {
+  modal.classList.remove('open');
+  history.replaceState(null, null, ' ');
+};
+document.getElementById('close-modal').onclick = closeModal;
+
+window.addEventListener('keydown', e => {
+  if (!modal.classList.contains('open')) return;
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'ArrowRight') openFigure(currentIndex + 1);
+  if (e.key === 'ArrowLeft') openFigure(currentIndex - 1);
+  if (e.key === '+' || e.key === '=') zoomBy(1.25, undefined, undefined, true);
+  if (e.key === '-') zoomBy(0.8, undefined, undefined, true);
+  if (e.key === '0') resetTransform();
+});
+
+renderGallery();
+const hash = window.location.hash.replace('#', '');
+const matchIdx = figures.findIndex(f => f.slug === hash);
+if (matchIdx !== -1) openFigure(matchIdx);
+</script>
 </body>
 </html>
