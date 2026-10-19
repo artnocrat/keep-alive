@@ -17,7 +17,7 @@ h1,h2,h3,#ct,.tile b{font-family:"Archivo","Arial Narrow",system-ui,sans-serif;f
 .wrap{position:relative;max-width:980px;margin:0 auto;padding:0 20px}
 button,a{font:inherit;color:inherit}
 :is(button,a):focus-visible{outline:3px solid var(--focus);outline-offset:3px}
-.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-bottom:1px solid var(--edge)}
+.nav{padding: 0.5em; position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-bottom:1px solid var(--edge)}
 .nav .wrap{display:flex;align-items:center;min-height:52px}
 .brand{display:flex;align-items:center;font-family:"Archivo",system-ui,sans-serif;font-stretch:122%;font-weight:800;letter-spacing:.01em}
 .lamp{width:9px;height:9px;margin-right:10px;border-radius:50%;background:var(--lamp);box-shadow:0 0 12px var(--lamp);animation:blink 2.6s infinite}
@@ -32,7 +32,7 @@ button,a{font:inherit;color:inherit}
 @keyframes lift{to{opacity:1;transform:none}}
 h1{font-size:clamp(2.1rem,9.2vw,4.6rem);line-height:1.04;letter-spacing:-.015em;max-width:14ch;text-wrap:balance}
 .hero p{font-size:clamp(1.1rem,4.4vw,1.45rem);line-height:1.35;color:var(--muted);max-width:30ch;margin:20px 0 30px}
-.cta{display:inline-flex;align-items:center;min-height:52px;padding:0 28px;border-radius:14px;background:var(--lamp);color:var(--lamp-ink);text-decoration:none;font-weight:700;box-shadow:0 10px 34px -10px var(--lamp)}
+.cta{margin-top: 3em; display:inline-flex;align-items:center;min-height:52px;padding:0 28px;border-radius:14px;background:var(--lamp);color:var(--lamp-ink);text-decoration:none;font-weight:700;box-shadow:0 10px 34px -10px var(--lamp)}
 .cta::after{content:"\2193";margin-left:10px}
 h2{font-size:clamp(1.65rem,6.4vw,2.8rem);line-height:1.06;letter-spacing:-.01em;max-width:18ch;text-wrap:balance}
 .lede{color:var(--muted);font-size:clamp(1.05rem,3.8vw,1.25rem);line-height:1.4;max-width:34ch;margin:14px 0 28px}
@@ -139,6 +139,7 @@ h2{font-size:clamp(2.4rem,4.4vw,3.6rem)}
 .pr{gap:56px}.pr h3{font-size:1.9rem}.pr p{font-size:1.15rem}
 }
 @media (prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;animation:none}.ecg path{animation:none;stroke-dashoffset:0}.hero::before,.hero-art::before,.hero-art::after,.lamp,.ln.on,.cap.in,.tile.bad,.tile[data-c=phone].bad,dialog[open],dialog[open]::backdrop{animation:none}.tile{transition:none}}
+
 </style>
 </head>
 <body>
@@ -148,7 +149,6 @@ h2{font-size:clamp(2.4rem,4.4vw,3.6rem)}
 <section class="hero"><div class="wrap hero-grid"><div class="hero-art">
 <svg class="ecg" viewBox="0 0 600 100" aria-hidden="true"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" style="stop-color:var(--lamp)"/><stop offset="1" style="stop-color:var(--focus)"/></linearGradient></defs><path pathLength="1" d="M0 56H150L170 56L186 18L206 92L224 40L240 56H380L400 56L416 24L434 86L450 46L464 56H600" fill="none" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="hero-copy">
 <h1 class="rise" style="--i:1">Know the moment something breaks.</h1>
-<p class="rise" style="--i:2">Keep Alive watches every service the bank depends on, and tells the right people straight away.</p>
 <a class="cta rise" style="--i:3" href="#play">See it work</a>
 </div></div></section>
 <section class="demo" id="demo"><div class="wrap">
