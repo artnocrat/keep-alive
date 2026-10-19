@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agmb Keep Alive Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..900&family=Schibsted+Grotesk:wght@400..700&display=swap">
+<style>
+:root{--bg:#080c18;--panel:#0f1730;--panel2:#17234d;--edge:rgba(255,255,255,.09);--ink:#eef1fa;--muted:#9aa4c0;--line:#34406b;--dot:rgba(255,255,255,.075);--lamp:#ffb020;--wire:#ffb020;--lamp-ink:#1a1100;--glow:rgba(255,176,32,.2);--glass:rgba(8,12,24,.74);--ok:#3be8b0;--warn:#ffb020;--bad:#ff5448;--focus:#5cc8ff;
+color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#e9edf5;--panel:#fff;--panel2:#f3f5fa;--edge:rgba(11,18,38,.11);--ink:#0b1226;--muted:#535d77;--line:#aab3c9;--dot:rgba(11,18,38,.09);--wire:#d96a00;--glow:rgba(255,176,32,.3);--glass:rgba(233,237,245,.78);--ok:#0b8f62;--warn:#b45f00;--bad:#d3261b;--focus:#0a68c4;color-scheme:light}}
+:root[data-theme="light"]{--bg:#e9edf5;--panel:#fff;--panel2:#f3f5fa;--edge:rgba(11,18,38,.11);--ink:#0b1226;--muted:#535d77;--line:#aab3c9;--dot:rgba(11,18,38,.09);--wire:#d96a00;--glow:rgba(255,176,32,.3);--glass:rgba(233,237,245,.78);--ok:#0b8f62;--warn:#b45f00;--bad:#d3261b;--focus:#0a68c4;color-scheme:light}
+html{scroll-padding-top:calc(64px + env(safe-area-inset-top,0px));scroll-snap-type:y proximity}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 "Schibsted Grotesk","Avenir Next","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);z-index:10}
+.atmo{position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(70% 45% at 50% -5%,var(--glow),transparent 70%),radial-gradient(circle at 1px 1px,var(--dot) 1px,transparent 1.6px) 0 0/26px 26px;-webkit-mask-image:linear-gradient(#000 40%,transparent 100%);mask-image:linear-gradient(#000 40%,transparent 100%)}
+h1,h2,h3,#ct,.tile b{font-family:"Archivo","Arial Narrow",system-ui,sans-serif;font-stretch:122%;font-weight:800;margin:0}
+.wrap{position:relative;max-width:980px;margin:0 auto;padding:0 20px}
+button,a{font:inherit;color:inherit}
+:is(button,a):focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-bottom:1px solid var(--edge)}
+.nav .wrap{display:flex;align-items:center;min-height:52px}
+.brand{display:flex;align-items:center;font-family:"Archivo",system-ui,sans-serif;font-stretch:122%;font-weight:800;letter-spacing:.01em}
+.lamp{width:9px;height:9px;margin-right:10px;border-radius:50%;background:var(--lamp);box-shadow:0 0 12px var(--lamp);animation:blink 2.6s infinite}
+@keyframes blink{0%,40%,100%{transform:scale(1);opacity:.75}10%,30%{transform:scale(1.35);opacity:1}20%{transform:scale(1);opacity:.8}}
+.hero{position:relative;padding:48px 0 68px;overflow:hidden}
+.hero::before{content:"";position:absolute;width:150%;aspect-ratio:1;left:-25%;top:-75%;background:radial-gradient(closest-side,var(--glow),transparent);animation:beat 2.6s ease-in-out infinite;pointer-events:none}
+@keyframes beat{0%,40%,100%{transform:scale(1);opacity:.65}10%{transform:scale(1.08);opacity:1}22%{transform:scale(1.02);opacity:.8}30%{transform:scale(1.06);opacity:.95}}
+.ecg{display:block;width:min(100%,540px);height:auto;margin:0 0 30px;filter:drop-shadow(0 0 8px var(--glow))}
+.ecg path{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 2.6s .3s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.rise{opacity:0;transform:translateY(18px);animation:lift .9s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(var(--i,0) * 120ms + 350ms)}
+@keyframes lift{to{opacity:1;transform:none}}
+h1{font-size:clamp(2.1rem,9.2vw,4.6rem);line-height:1.04;letter-spacing:-.015em;max-width:14ch;text-wrap:balance}
+.hero p{font-size:clamp(1.1rem,4.4vw,1.45rem);line-height:1.35;color:var(--muted);max-width:30ch;margin:20px 0 30px}
+.cta{display:inline-flex;align-items:center;min-height:52px;padding:0 28px;border-radius:14px;background:var(--lamp);color:var(--lamp-ink);text-decoration:none;font-weight:700;box-shadow:0 10px 34px -10px var(--lamp)}
+.cta::after{content:"\2193";margin-left:10px}
+h2{font-size:clamp(1.65rem,6.4vw,2.8rem);line-height:1.06;letter-spacing:-.01em;max-width:18ch;text-wrap:balance}
+.lede{color:var(--muted);font-size:clamp(1.05rem,3.8vw,1.25rem);line-height:1.4;max-width:34ch;margin:14px 0 28px}
+.demo{padding:72px 0;border-top:1px solid var(--edge)}#play{scroll-snap-align:start}
+.pills{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;margin:0 -20px 16px;padding:4px 20px;scrollbar-width:none}
+.pills button{flex:none;scroll-snap-align:start;min-height:44px;padding:0 18px;border:1px solid var(--edge);border-radius:12px;background:var(--panel);font-weight:600;cursor:pointer;transition:background .25s,box-shadow .25s}
+.pills button[aria-pressed=true]{background:var(--lamp);color:var(--lamp-ink);border-color:var(--lamp);box-shadow:0 0 26px -6px var(--lamp)}
+.stage{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--edge);border-radius:28px;padding:16px;box-shadow:0 40px 90px -50px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.06)}
+.scene{position:relative;container-type:inline-size;aspect-ratio:320/420;max-width:440px;margin:0 auto;width:clamp(230px,calc((100vh - 390px) * .762),100%);width:clamp(230px,calc((100dvh - 390px) * .762),100%)}
+.scene::before{content:"";position:absolute;inset:-6px;border-radius:20px;background:radial-gradient(circle at 1px 1px,var(--dot) 1px,transparent 1.5px) 0 0/16px 16px}
+.scene svg{position:absolute;inset:0;width:100%;height:100%}
+.ln{fill:none;stroke:var(--line);stroke-width:2;stroke-linecap:round}
+.ln.on{stroke:var(--wire);stroke-width:3;stroke-dasharray:2 7;animation:flow .7s linear infinite;filter:drop-shadow(0 0 3px var(--wire))}
+@keyframes flow{to{stroke-dashoffset:-9}}
+.wall{fill:none;stroke:var(--line);stroke-dasharray:5 5;stroke-width:1.5}
+.wl{font-size:10.5px;fill:var(--muted);text-anchor:middle}
+.tile{--sc:var(--ok);position:absolute;display:flex;flex-direction:column;justify-content:center;gap:3px;padding:0 calc(100cqw * 10 / 320);border:1px solid var(--edge);border-radius:calc(100cqw * 16 / 320);background:linear-gradient(180deg,var(--panel2),var(--panel));color:var(--ink);text-align:left;cursor:pointer;line-height:1.2;box-shadow:0 12px 26px -16px rgba(0,0,0,.7);transition:box-shadow .45s,opacity .45s,border-color .45s}
+.tile b{font-size:calc(100cqw * 13 / 320);font-weight:700;letter-spacing:0}
+.tile span{display:flex;align-items:center;gap:7px;color:var(--muted)}
+.tile em{font-style:normal;font-size:calc(100cqw * 12 / 320)}
+.dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--sc);box-shadow:0 0 9px 1px var(--sc)}
+.tile.bad{--sc:var(--bad);border-color:var(--bad);animation:ring 1.7s ease-out infinite}
+.tile.warn{--sc:var(--warn)}.tile.off{--sc:var(--muted);opacity:.5}.tile.focus{--sc:var(--focus)}
+.tile.warn,.tile.focus{border-color:var(--sc);box-shadow:0 0 0 2px color-mix(in srgb,var(--sc) 45%,transparent),0 0 26px -4px var(--sc)}
+@keyframes ring{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--sc) 60%,transparent),0 0 26px -4px var(--sc)}100%{box-shadow:0 0 0 16px transparent,0 0 26px -4px var(--sc)}}
+.tile[data-c=phone].bad{animation:ring 1.7s ease-out infinite,buzz .6s}
+@keyframes buzz{15%{transform:translateX(-5px) rotate(-.7deg)}30%{transform:translateX(5px) rotate(.7deg)}45%{transform:translateX(-4px)}60%{transform:translateX(4px)}80%{transform:translateX(-1px)}}
+.hint{text-align:center;font-size:12px;color:var(--muted);margin:6px 0 0}
+.cap{min-height:9rem;padding:12px 4px 0}
+.cap.in{animation:rise2 .55s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise2{from{opacity:0;transform:translateY(10px)}}
+#ct{font-size:clamp(1.35rem,5.6vw,1.85rem);line-height:1.12;letter-spacing:-.005em}
+#cd{margin:8px 0 0;color:var(--muted);font-size:16px;line-height:1.42}
+.ctl{display:flex;align-items:center;gap:12px;margin-top:8px}
+.prog{flex:1;display:flex;gap:6px}
+.prog button{flex:1;min-height:44px;background:none;border:0;padding:0;position:relative;cursor:pointer}
+.prog button::after{content:"";position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;border-radius:2px;background:var(--line);transition:background .3s}
+.prog .done::after{background:var(--wire);opacity:.5}.prog [aria-current]::after{background:var(--lamp);box-shadow:0 0 12px var(--lamp)}
+.pp{min-height:44px;min-width:88px;padding:0 18px;border:1px solid var(--edge);border-radius:12px;background:var(--panel);font-weight:600;cursor:pointer}
+.nx{background:none;border:0;min-height:44px;padding:0 4px;cursor:pointer;font-weight:700}
+.nx::after{content:" \2192";color:var(--wire)}
+.nx[disabled]{opacity:.35;cursor:default}
+.promises{padding:72px 0 80px;border-top:1px solid var(--edge)}
+.pr{display:grid;gap:32px;margin-top:36px}
+.pr>div{border-top:2px solid var(--wire);padding-top:18px}
+.pr h3{font-size:clamp(1.25rem,5vw,1.6rem);line-height:1.12}
+.pr p{margin:10px 0 0;color:var(--muted)}
+footer{padding:0 0 56px;color:var(--muted);font-size:13px}
+dialog{width:100%;max-width:600px;margin:auto auto 0;padding:0;border:1px solid var(--edge);border-radius:28px 28px 0 0;background:var(--panel);color:var(--ink);overflow:visible}
+dialog::backdrop{background:rgba(4,7,16,.6);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+dialog[open]{animation:up .45s cubic-bezier(.2,.8,.2,1)}
+dialog[open]::backdrop{animation:fade .3s}
+@keyframes up{from{transform:translateY(100%)}}
+@keyframes fade{from{opacity:0}}
+.in2{padding:10px 24px calc(28px + env(safe-area-inset-bottom,0px))}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 10px}
+.top{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:14px}
+.done{background:none;border:0;font-weight:700;min-height:44px;padding:0 4px;cursor:pointer}
+dialog h2{font-size:1.7rem;margin:2px 0 12px}
+dialog p{margin:0 0 14px}
+dialog .tech{color:var(--muted);font-size:15px}
+dialog small{display:block;color:var(--muted);font-size:13px;margin:18px 0 4px}
+@media (min-width:860px){
+.wrap{padding:0 32px}.pills{margin:0 0 16px;padding:4px 0}
+.stage{display:grid;grid-template-columns:minmax(0,440px) 1fr;gap:44px;align-items:center;padding:32px}
+.cap{min-height:0;padding:0}.scene{width:100%}
+.right{display:flex;flex-direction:column;gap:14px}
+.pr{grid-template-columns:repeat(3,1fr);gap:40px}
+dialog{margin:auto;border-radius:28px}.grab{display:none}.in2{padding-bottom:28px}}
+@media (prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;animation:none}.ecg path{animation:none;stroke-dashoffset:0}.hero::before,.lamp,.ln.on,.cap.in,.tile.bad,.tile[data-c=phone].bad,dialog[open],dialog[open]::backdrop{animation:none}.tile{transition:none}}
+</style>
+</head>
+<body>
+<div class="atmo" aria-hidden="true"></div>
+<header class="nav"><div class="wrap"><span class="brand"><i class="lamp"></i>Keep Alive</span></div></header>
+<main>
+<section class="hero"><div class="wrap">
+<svg class="ecg" viewBox="0 0 600 100" aria-hidden="true"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" style="stop-color:var(--lamp)"/><stop offset="1" style="stop-color:var(--focus)"/></linearGradient></defs><path pathLength="1" d="M0 56H150L170 56L186 18L206 92L224 40L240 56H380L400 56L416 24L434 86L450 46L464 56H600" fill="none" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<h1 class="rise" style="--i:1">Know the moment something breaks.</h1>
+<p class="rise" style="--i:2">Keep Alive watches every service the bank depends on, and tells the right people straight away.</p>
+<a class="cta rise" style="--i:3" href="#play">See it work</a>
+</div></section>
+<section class="demo" id="demo"><div class="wrap">
+<h2>Break something. See what happens.</h2>
+<p class="lede">Pick a situation and watch Keep Alive respond, one step at a time.</p>
+<div id="play"><div class="pills" id="pills" role="group" aria-label="Situation"></div>
+<div class="stage" id="stage">
+<div><div class="scene" id="scene">
+<svg viewBox="0 0 320 420" aria-hidden="true"><rect class="wall" x="80" y="0" width="160" height="78" rx="16"/><text class="wl" x="160" y="94">Bank walls</text><g id="lines"></g></svg>
+<div id="tiles"></div></div>
+<p class="hint">Tap any tile to see what it is.</p></div>
+<div class="right"><div class="cap" id="cap" aria-live="polite"><h3 id="ct"></h3><p id="cd"></p></div>
+<div class="ctl"><button class="pp" id="pp" type="button">Pause</button><div class="prog" id="prog"></div><button class="nx" id="nx" type="button">Next</button></div></div>
+</div></div></div></section>
+<section class="promises"><div class="wrap"><h2>Three promises.</h2>
+<div class="pr"><div><h3>Looks. Never touches.</h3><p>It only checks whether a service answers. It changes nothing.</p></div>
+<div><h3>Outside, with no way in.</h3><p>It lives outside the bank, so it can never become a door for attackers.</p></div>
+<div><h3>Silence is never good news.</h3><p>If Keep Alive itself stops, something else notices and says so.</p></div></div></div></section>
+</main>
+<footer><div class="wrap">Software design for AG Mortgage Bank. Figures 3.1 and 3.2.</div></footer>
+<dialog id="sheet" aria-labelledby="sh-t"><div class="in2"><div class="grab"></div><div class="top"><span>What it is</span><button class="done" type="button" id="done">Done</button></div><h2 id="sh-t"></h2><p id="sh-d"></p><small>For the technical reader</small><p class="tech" id="sh-x"></p></div></dialog>
+<script>
+const $=s=>document.querySelector(s),rm=matchMedia('(prefers-reduced-motion: reduce)').matches,NS='http://www.w3.org/2000/svg';
+const h=(t,a={},...k)=>{const e=document.createElement(t);for(const x in a)x=='class'?e.className=a[x]:e.setAttribute(x,a[x]);e.append(...k.filter(Boolean));return e};
+const T=[['svc',95,6,130,62,'Bank service','Running'],['A',8,122,140,62,'Checker A','Sees it'],['B',172,122,140,62,'Checker B','Sees it'],['brain',8,238,140,62,'The brain','Calm'],['dog',172,238,140,62,'The watchdog','Listening'],['phone',50,350,220,62,'Your inbox','Nothing new']];
+const P={as:'M95 122L130 68',bs:'M225 122L190 68',ab:'M78 184V238',bb:'M200 184L130 238',bd:'M148 269H172',bp:'M78 300L115 350',dp:'M242 300L205 350'};
+const D={
+svc:['Your services','The websites and systems the bank depends on. Keep Alive only looks at them. It never changes them.','Public services are checked read-only. Internal 192.168.1.x services cannot be reached from outside, so they are listed but not checked.'],
+A:['Checker A','A small program in one place on the internet. Every 25 seconds it visits each service and notes whether it answered, and how fast.','KA-1 Probe worker, location A. HTTP, TCP, TLS-expiry and DNS checks from a fixed address the bank can allow.'],
+B:['Checker B','The same job as Checker A, from a different place. Two viewpoints mean one bad connection cannot fool the system.','KA-1 Probe worker, location B, at a different provider or region.'],
+brain:['The brain','Collects what the checkers saw and decides whether a problem is real. It waits for both checkers to agree, so a single blip never wakes anyone up.','KA-2 Ingestion API, KA-4 Alert engine and KA-5 Notifier. The state change and the alert are saved in one database transaction (KA-3), so no alert is lost or duplicated.'],
+dog:['The watchdog','A separate guard whose only job is to check that the brain is alive. If the brain goes quiet, the watchdog raises the alarm itself.','KA-14 Watchdog on a separate provider and alert channel. The platform sends it a heartbeat every minute (KA-13).'],
+phone:['Your inbox','Where alerts arrive: an email when something breaks, and another when it is fixed.','Delivered through ZeptoMail from a durable outbox, with retries and a recorded outcome.']};
+const SC=[
+{n:'An outage',s:[
+{t:'Two checkers visit every service.',d:'Every 25 seconds, from outside the bank, the way a customer would.',on:['as','bs']},
+{t:'One service stops answering.',d:'Both checkers notice straight away.',s:{svc:'bad|Not answering',A:'warn|Can\'t reach it',B:'warn|Can\'t reach it'},on:['as','bs']},
+{t:'The brain waits for both to agree.',d:'One missed visit could be a blip, so it checks again before raising the alarm.',s:{brain:'warn|Double-checking'},on:['ab','bb']},
+{t:'Both agree. It really is down.',d:'The brain records the problem and decides to alert.',s:{brain:'bad|It\'s really down'},on:['ab','bb']},
+{t:'An email reaches your team.',d:'The alert is saved before it is sent, so it can never be lost.',s:{phone:'bad|Payments service is down'},on:['bp']},
+{t:'When it recovers, you hear that too.',d:'A second email says everything is back.',s:{svc:'ok|Running',A:'ok|Sees it',B:'ok|Sees it',brain:'ok|Calm',phone:'ok|Payments is back'},on:['as','bs']}]},
+{n:'A weak signal',s:[
+{t:'Checker B loses its internet.',d:'The checkers sit in different places, so this can happen to one on its own.',s:{B:'off|No signal'}},
+{t:'Checker A still reaches the service.',d:'The two checkers now disagree.',on:['as','ab']},
+{t:'So the brain stays calm.',d:'One checker having trouble is not an outage. No false alarm.',s:{brain:'ok|Not alarmed'},on:['ab']},
+{t:'Your team gets a small heads-up.',d:'It says Checker B lost signal. It does not say the service is down.',s:{phone:'warn|Checker B lost signal'},on:['bp']},
+{t:'The signal returns. All calm again.',d:'',s:{B:'ok|Sees it',phone:'ok|Nothing new'},on:['as','bs']}]},
+{n:'A system crash',s:[
+{t:'Every minute the brain says "I\'m alive".',d:'The message goes to the watchdog, which lives somewhere else entirely.',on:['bd']},
+{t:'Then the brain stops.',d:'A crash, a power cut, anything.',s:{brain:'off|Stopped'}},
+{t:'The watchdog notices the silence.',d:'It expects a message every minute. Nothing arrives.',s:{dog:'warn|Nothing heard'}},
+{t:'It sounds the alarm on its own.',d:'It does not go through the brain, so it still works. Silence is never mistaken for good news.',s:{dog:'bad|Alarm!',phone:'bad|Monitoring is down'},on:['dp']}]},
+{n:'Where it lives',s:[
+{t:'The bank\'s services sit inside the bank.',d:'Behind its walls and firewall.',s:{svc:'focus|Inside the bank'}},
+{t:'Keep Alive lives entirely outside.',d:'It knocks on the front door like a customer. It has no way in, so it cannot become a way in for attackers.',s:{svc:'ok|Running',A:'focus|Outside',B:'focus|Outside',brain:'focus|Outside'},on:['as','bs']},
+{t:'The checkers live in two different places.',d:'So one bad connection can never fool it.',s:{A:'focus|Place 1',B:'focus|Place 2',brain:'ok|Calm'},on:['as','bs']},
+{t:'The watchdog lives somewhere else again.',d:'So it cannot fail at the same moment as the brain.',s:{A:'ok|Sees it',B:'ok|Sees it',dog:'focus|Its own home'},on:['bd']}]}];
+const tiles={},lines={};let cur,step=0,timer,touched=false;
+T.forEach(t=>{const b=h('button',{class:'tile ok',type:'button','data-c':t[0]},h('b',{},t[5]),h('span',{},h('i',{class:'dot'}),h('em',{},t[6])));
+ Object.assign(b.style,{left:t[1]/320*100+'%',top:t[2]/420*100+'%',width:t[3]/320*100+'%',height:t[4]/420*100+'%'});tiles[t[0]]=b;$('#tiles').append(b)});
+for(const k in P){const p=document.createElementNS(NS,'path');p.setAttribute('d',P[k]);p.setAttribute('class','ln');$('#lines').append(p);lines[k]=p}
+function state(i){const s={};T.forEach(t=>s[t[0]]=['ok',t[6]]);for(let j=0;j<=i;j++){const o=cur.s[j].s||{};for(const k in o)s[k]=o[k].split('|')}return s}
+function show(i){step=i;const st=cur.s[i],s=state(i);
+ T.forEach(t=>{tiles[t[0]].className='tile '+s[t[0]][0];tiles[t[0]].querySelector('em').textContent=s[t[0]][1]});
+ for(const k in lines)lines[k].classList.toggle('on',(st.on||[]).includes(k));
+ $('#ct').textContent=st.t;$('#cd').textContent=st.d;const c=$('#cap');c.classList.remove('in');void c.offsetWidth;c.classList.add('in');
+ [...$('#prog').children].forEach((b,j)=>{b.className=j<i?'done':'';j==i?b.setAttribute('aria-current','step'):b.removeAttribute('aria-current')});
+ $('#nx').disabled=i==cur.s.length-1;upd()}
+function upd(){if(!cur)return;$('#pp').textContent=timer?'Pause':step==cur.s.length-1?'Replay':'Play'}
+function stop(){clearInterval(timer);timer=null;upd()}
+function play(a){if(rm&&a)return;stop();timer=setInterval(()=>{if(step<cur.s.length-1)show(step+1);else stop()},4500);upd()}
+function pick(i){stop();cur=SC[i];[...$('#pills').children].forEach((b,j)=>b.setAttribute('aria-pressed',String(j==i)));
+ const p=$('#prog');p.textContent='';cur.s.forEach((_,j)=>{const b=h('button',{type:'button','aria-label':'Step '+(j+1)});b.onclick=()=>{touched=true;stop();show(j)};p.append(b)});
+ show(0);if(touched||inView)play(1)}
+SC.forEach((s,i)=>$('#pills').append(Object.assign(h('button',{type:'button','aria-pressed':'false'},s.n),{onclick(){touched=true;pick(i)}})));
+$('#pp').onclick=()=>{touched=true;if(timer)stop();else{if(step==cur.s.length-1)show(0);play()}};
+$('#nx').onclick=()=>{touched=true;stop();if(step<cur.s.length-1)show(step+1)};
+let inView=false;new IntersectionObserver(es=>es.forEach(e=>{inView=e.isIntersecting;if(inView&&!touched&&!timer&&step==0)play(1);if(!inView)stop()}),{threshold:.6}).observe($('#stage'));
+const sheet=$('#sheet');
+document.addEventListener('click',e=>{const c=e.target.closest('[data-c]');if(!c)return;touched=true;stop();const d=D[c.dataset.c];$('#sh-t').textContent=d[0];$('#sh-d').textContent=d[1];$('#sh-x').textContent=d[2];sheet.showModal()});
+$('#done').onclick=()=>sheet.close();sheet.addEventListener('click',e=>{if(e.target===sheet)sheet.close()});
+pick(0);
+</script>
+</body>
+</html>
