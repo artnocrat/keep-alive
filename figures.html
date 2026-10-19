@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AGMB Keep-Alive — SDD Figures Gallery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans selection:bg-blue-500 selection:text-white">
+
+  <!-- Sticky Top Bar -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div>
+        <div class="flex items-center gap-2.5">
+          <span class="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h1 class="text-xl font-bold tracking-tight">AGMB Keep-Alive — SDD Figures</h1>
+        </div>
+        <p class="text-xs text-slate-400 mt-0.5">High-resolution diagrams from the Software Design Document • Click any figure to pan & zoom</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="https://docs.google.com/document/d/1YlEdDHDNlh-fyaAr7SU5GsGc8Jer7q9eGm_IvGP1CLE/edit?usp=sharing" target="_blank" rel="noopener"
+           class="text-xs sm:text-sm bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3.5 py-2 rounded-lg transition">
+          📄 Read SDD Doc
+        </a>
+        <a href="/keep-alive/"
+           class="text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2 rounded-lg border border-slate-700 transition">
+          ← Interactive App
+        </a>
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="max-w-7xl mx-auto px-6 pb-3 flex gap-2 overflow-x-auto" id="filter-tabs">
+      <button data-filter="all" class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full bg-blue-600 text-white transition">All Figures (5)</button>
+      <button data-filter="3" class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Sec 3: Architecture (2)</button>
+      <button data-filter="4" class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Sec 4: Data Design (2)</button>
+      <button data-filter="5" class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Sec 5: Component Design (1)</button>
+    </div>
+  </header>
+
+  <!-- Gallery Grid -->
+  <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6" id="gallery"></main>
+
+  <!-- Interactive Pan/Zoom Lightbox Modal -->
+  <div id="modal" class="fixed inset-0 bg-slate-950/95 z-50 hidden flex-col">
+    <!-- Modal Header -->
+    <div class="flex flex-wrap justify-between items-center px-6 py-3.5 bg-slate-900 border-b border-slate-800 gap-3">
+      <div class="flex items-center gap-3">
+        <span id="modal-badge" class="text-xs font-mono uppercase bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2.5 py-0.5 rounded"></span>
+        <div>
+          <h3 id="modal-title" class="font-semibold text-sm sm:text-base"></h3>
+          <p id="modal-section" class="text-xs text-slate-400"></p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="prev-btn" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded border border-slate-700 transition" title="Previous Figure (Left Arrow)">← Prev</button>
+        <button id="next-btn" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded border border-slate-700 transition" title="Next Figure (Right Arrow)">Next →</button>
+        <span class="text-slate-700 mx-1">|</span>
+        <button id="zoom-in" class="text-xs bg-slate-800 hover:bg-slate-700 px-2.5 py-1.5 rounded border border-slate-700 transition">+</button>
+        <button id="zoom-out" class="text-xs bg-slate-800 hover:bg-slate-700 px-2.5 py-1.5 rounded border border-slate-700 transition">−</button>
+        <button id="reset-zoom" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded border border-slate-700 transition">Reset</button>
+        <a id="open-raw" href="#" target="_blank" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded border border-slate-700 transition">Raw ↗</a>
+        <button id="close-modal" class="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-300 px-3 py-1.5 rounded border border-red-500/30 transition">Close (Esc)</button>
+      </div>
+    </div>
+
+    <!-- Panzoom Canvas -->
+    <div class="flex-1 overflow-hidden flex items-center justify-center cursor-grab active:cursor-grabbing relative" id="panzoom-container">
+      <img id="modal-img" src="" alt="Diagram" class="max-h-[82vh] max-w-[92vw] object-contain select-none shadow-2xl" />
+      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-900/80 border border-slate-800 text-slate-400 text-[11px] px-3 py-1 rounded-full pointer-events-none">
+        Scroll to zoom • Drag to pan • Use ← / → arrow keys to switch figures
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const figures = [
+      {
+        slug: "fig-3-1",
+        id: "Figure 3.1",
+        group: "3",
+        section: "Section 3.1.1 — Architecture",
+        title: "Architecture",
+        desc: "System-wide architectural topology showing how Probe Worker (KA-1), Ingestion API (KA-2), Alert Engine (KA-4), and Notifier (KA-5) interact.",
+        src: "assets/fig-3-1-architecture.png"
+      },
+      {
+        slug: "fig-3-2",
+        id: "Figure 3.2",
+        group: "3",
+        section: "Section 3.1.3 — Deployment and Operations View",
+        title: "Deployment",
+        desc: "Infrastructure layout, container boundaries, network zones, and runtime deployment topology for AGMB Keep-Alive.",
+        src: "assets/fig-3-2-deployment.png"
+      },
+      {
+        slug: "fig-4-1",
+        id: "Figure 4.1",
+        group: "4",
+        section: "Section 4.1.2 — Alert State Model",
+        title: "Alert state model",
+        desc: "Finite state machine governing state transitions across healthy, pending, firing, acknowledged, and resolved service states.",
+        src: "assets/fig-4-1-alert-state.png"
+      },
+      {
+        slug: "fig-4-2",
+        id: "Figure 4.2",
+        group: "4",
+        section: "Section 4.1.1 / 4.2 — Principal Data & Data Dictionary",
+        title: "Data model",
+        desc: "Entity-relationship schema detailing tables, primary/foreign keys, probe telemetry records, and alert history storage.",
+        src: "assets/fig-4-2-data-model.png"
+      },
+      {
+        slug: "fig-5-1",
+        id: "Figure 5.1",
+        group: "5",
+        section: "Section 5.3 — Worked Scenario: A Service Stops Answering",
+        title: "Sequence of a service outage",
+        desc: "End-to-end chronological sequence diagram tracing a failed health check from KA-1 probe timeout to KA-5 alert dispatch.",
+        src: "assets/fig-5-1-outage-sequence.png"
+      }
+    ];
+
+    let currentIndex = 0;
+    const gallery = document.getElementById('gallery');
+    const modal = document.getElementById('modal');
+    const modalImg = document.getElementById('modal-img');
+    const modalTitle = document.getElementById('modal-title');
+    const modalSection = document.getElementById('modal-section');
+    const modalBadge = document.getElementById('modal-badge');
+    const openRaw = document.getElementById('open-raw');
+    const container = document.getElementById('panzoom-container');
+
+    const panzoom = Panzoom(modalImg, { maxScale: 8, minScale: 0.4, contain: 'outside' });
+    container.addEventListener('wheel', panzoom.zoomWithWheel);
+
+    function openFigure(index) {
+      currentIndex = (index + figures.length) % figures.length;
+      const fig = figures[currentIndex];
+      modalImg.src = fig.src;
+      modalTitle.textContent = fig.title;
+      modalSection.textContent = fig.section;
+      modalBadge.textContent = fig.id;
+      openRaw.href = fig.src;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      history.replaceState(null, null, `#${fig.slug}`);
+      setTimeout(() => panzoom.reset(), 40);
+    }
+
+    function renderGallery(filterGroup = 'all') {
+      gallery.innerHTML = '';
+      figures.forEach((fig, idx) => {
+        if (filterGroup !== 'all' && fig.group !== filterGroup) return;
+        const card = document.createElement('div');
+        card.className = "bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-blue-500/50 transition cursor-pointer group flex flex-col shadow-lg";
+        card.innerHTML = `
+          <div class="h-64 bg-slate-950/70 p-4 flex items-center justify-center overflow-hidden border-b border-slate-800 relative">
+            <img src="${fig.src}" alt="${fig.id}: ${fig.title}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300" />
+            <span class="absolute top-3 right-3 text-[11px] bg-slate-900/90 border border-slate-700 text-slate-300 px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition">
+              🔍 Click to zoom
+            </span>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <span class="text-xs font-mono font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-0.5 rounded">${fig.id}</span>
+                <span class="text-xs text-slate-400 truncate">${fig.section}</span>
+              </div>
+              <h2 class="text-lg font-bold text-slate-100 mb-1">${fig.title}</h2>
+              <p class="text-sm text-slate-400 leading-relaxed">${fig.desc}</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-800/80 flex justify-between items-center text-xs text-blue-400">
+              <span class="group-hover:underline">Open interactive view</span>
+              <span>→</span>
+            </div>
+          </div>
+        `;
+        card.onclick = () => openFigure(idx);
+        gallery.appendChild(card);
+      });
+    }
+
+    // Filter Buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.filter-btn').forEach(b => {
+          b.className = "filter-btn text-xs font-medium px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+        });
+        btn.className = "filter-btn text-xs font-medium px-3 py-1.5 rounded-full bg-blue-600 text-white transition";
+        renderGallery(btn.dataset.filter);
+      };
+    });
+
+    // Modal Controls
+    document.getElementById('prev-btn').onclick = () => openFigure(currentIndex - 1);
+    document.getElementById('next-btn').onclick = () => openFigure(currentIndex + 1);
+    document.getElementById('zoom-in').onclick = () => panzoom.zoomIn();
+    document.getElementById('zoom-out').onclick = () => panzoom.zoomOut();
+    document.getElementById('reset-zoom').onclick = () => panzoom.reset();
+
+    const closeModal = () => {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      history.replaceState(null, null, ' ');
+    };
+    document.getElementById('close-modal').onclick = closeModal;
+
+    window.addEventListener('keydown', e => {
+      if (modal.classList.contains('hidden')) return;
+      if (e.key === 'Escape') closeModal();
+      if (e.key === 'ArrowRight') openFigure(currentIndex + 1);
+      if (e.key === 'ArrowLeft') openFigure(currentIndex - 1);
+    });
+
+    // Initial Render + URL Hash Deep-link Support
+    renderGallery();
+    const hash = window.location.hash.replace('#', '');
+    const matchIdx = figures.findIndex(f => f.slug === hash);
+    if (matchIdx !== -1) openFigure(matchIdx);
+  </script>
+</body>
+</html>
